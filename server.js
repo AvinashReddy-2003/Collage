@@ -8,9 +8,9 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
-// MongoDB connection
+// ---------------- MongoDB Connection ----------------
 mongoose.connect(process.env.MONGO_URI, {
     serverSelectionTimeoutMS: 5000
 })
@@ -20,7 +20,7 @@ mongoose.connect(process.env.MONGO_URI, {
         process.exit(1);
     });
 
-// Student Schema
+// ---------------- Student Schema ----------------
 const studentSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -28,20 +28,25 @@ const studentSchema = new mongoose.Schema({
 });
 const Student = mongoose.model('Student', studentSchema);
 
-// Middleware
+// ---------------- Middleware ----------------
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Serve static files from the public folder
+// ---------------- Static Files ----------------
 const publicPath = path.join(__dirname, 'public');
 app.use(express.static(publicPath));
 
-// Root route: serve collage.html
+// ---------------- Routes ----------------
+
+// Root route: collage.html
 app.get('/', (req, res) => {
     const filePath = path.join(publicPath, 'collage.html');
     console.log(`Serving: ${filePath}`);
-    res.sendFile(filePath, (err) => {
-        if (err) console.error('Error sending collage.html:', err);
+    res.sendFile(filePath, err => {
+        if (err) {
+            console.error('Error sending collage.html:', err);
+            res.status(404).send("File not found");
+        }
     });
 });
 
@@ -49,8 +54,11 @@ app.get('/', (req, res) => {
 app.get('/dashboard', (req, res) => {
     const filePath = path.join(publicPath, 'dashboard.html');
     console.log(`Serving: ${filePath}`);
-    res.sendFile(filePath, (err) => {
-        if (err) console.error('Error sending dashboard.html:', err);
+    res.sendFile(filePath, err => {
+        if (err) {
+            console.error('Error sending dashboard.html:', err);
+            res.status(404).send("File not found");
+        }
     });
 });
 
@@ -58,6 +66,7 @@ app.get('/dashboard', (req, res) => {
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).send("Username and password required");
+
     try {
         const student = await Student.findOne({ username });
         if (!student) return res.status(401).send("Invalid username or password");
@@ -73,7 +82,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// In-memory OTP store (for demo)
+// OTP system (in-memory for demo)
 const otpStore = {};
 
 // Nodemailer setup
@@ -85,7 +94,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Send OTP route
+// Send OTP
 app.post('/send-otp', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
@@ -107,7 +116,7 @@ app.post('/send-otp', async (req, res) => {
     }
 });
 
-// Verify OTP route
+// Verify OTP
 app.post('/verify-otp', (req, res) => {
     const { email, otp } = req.body;
     if (otpStore[email] && otpStore[email] === otp) {

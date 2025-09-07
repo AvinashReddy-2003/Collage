@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Custom styles for the dashboard */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            /* Light gray background */
+        }
+
+        .header-bg {
+            background-color: #4a0e91;
+            /* Dark purple header */
+        }
+
+        .card-bg {
+            background-color: #ffffff;
+            /* White card background */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: #6d28d9;
+            /* Purple button */
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #5b21b6;
+            /* Darker purple on hover */
+        }
+
+        /* Styles for dynamic content within the welcome card */
+        .initial-content {
+            display: block;
+        }
+
+        .profile-content {
+            display: none;
+        }
+
+        /* When 'active' class is added to the card, toggle content visibility */
+        .card-bg.profile-active .initial-content {
+            display: none;
+        }
+
+        .card-bg.profile-active .profile-content {
+            display: block;
+        }
+
+        /* Styles for Marks Memo Display */
+        #marksMemoDisplay {
+            display: none;
+            /* Hidden by default */
+            grid-column: 1 / -1;
+            /* Make it span all columns */
+        }
+
+        #marksMemoDisplay.active {
+            display: block;
+            /* Show when active */
+        }
+
+        .marks-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .marks-table th,
+        .marks-table td {
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .marks-table th {
+            background-color: #f8fafc;
+            font-weight: bold;
+        }
+
+        /* Apply light blue text color to the first column (subjects) of the marks table */
+        .marks-table tbody tr td:first-child {
+            color: #4299e1;
+            /* A shade of light blue for text (Tailwind blue-500) */
+            /* Removed background-color: #e0f2f7; */
+        }
+
+        /* Styles for Academic Calendar Display (Fixed Overlay) */
+        #academicCalendarDisplay {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Fixed position relative to the viewport */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* Center the element */
+            width: 90%;
+            /* Take up 90% of the viewport width */
+            max-width: 900px;
+            /* Max width for larger screens */
+            height: 90%;
+            /* Take up 90% of the viewport height */
+            max-height: 700px;
+            /* Max height for larger screens */
+            background-color: #ffffff;
+            /* White background for the overlay */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            /* Stronger shadow */
+            z-index: 1000;
+            /* Ensure it's on top of other content */
+            padding: 20px;
+            border-radius: 0.5rem;
+            /* Rounded corners */
+            overflow: auto;
+            /* Scroll if content exceeds height */
+            flex-direction: column;
+            /* Arrange content vertically */
+            align-items: center;
+            /* Center items horizontally */
+            justify-content: flex-start;
+            /* Align content to top */
+        }
+
+        #academicCalendarDisplay.active {
+            display: flex;
+            /* Use flexbox to easily center content */
+        }
+
+        #academicCalendarDisplay h2,
+        #academicCalendarDisplay button {
+            flex-shrink: 0;
+            /* Prevent title and button from shrinking */
+        }
+
+        /* Styles for the Time Table */
+        .time-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            /* Smaller font for better fit */
+        }
+
+        .time-table th,
+        .time-table td {
+            border: 1px solid #cbd5e0;
+            /* Light gray border */
+            padding: 8px 6px;
+            text-align: center;
+        }
+
+        .time-table thead th {
+            background-color: #e2e8f0;
+            /* Light blue-gray header */
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .time-table tbody tr:nth-child(even) {
+            background-color: #f8fafc;
+            /* Slightly different background for even rows */
+        }
+
+        .time-table .break-cell {
+            background-color: #bfdbfe;
+            /* Light blue for break */
+            font-weight: bold;
+            writing-mode: vertical-lr;
+            /* Vertical text */
+            text-orientation: mixed;
+            /* Mixed orientation */
+            white-space: nowrap;
+            /* Prevent wrapping */
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px 5px;
+        }
+
+        .time-table .faculty-details {
+            font-size: 0.8rem;
+            margin-top: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .time-table .faculty-details th,
+        .time-table .faculty-details td {
+            padding: 6px;
+            border: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .time-table .faculty-details th {
+            background-color: #f8fafc;
+        }
+
+        @media (max-width: 768px) {
+            .time-table {
+                font-size: 0.75rem;
+            }
+
+            .time-table th,
+            .time-table td {
+                padding: 6px 4px;
+            }
+
+            .time-table .break-cell {
+                padding: 5px 3px;
+            }
+        }
+
+        /* Styles for Course Catalog Display (Fixed Overlay) */
+        #courseCatalogDisplay {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Fixed position relative to the viewport */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* Center the element */
+            width: 90%;
+            /* Take up 90% of the viewport width */
+            max-width: 900px;
+            /* Max width for larger screens */
+            height: 90%;
+            /* Take up 90% of the viewport height */
+            max-height: 700px;
+            /* Max height for larger screens */
+            background-color: #ffffff;
+            /* White background for the overlay */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            /* Stronger shadow */
+            z-index: 1000;
+            /* Ensure it's on top of other content */
+            padding: 20px;
+            border-radius: 0.5rem;
+            /* Rounded corners */
+            overflow: auto;
+            /* Scroll if content exceeds height */
+            flex-direction: column;
+            /* Arrange content vertically */
+            align-items: center;
+            /* Center items horizontally */
+            justify-content: flex-start;
+            /* Align content to top */
+        }
+
+        #courseCatalogDisplay.active {
+            display: flex;
+        }
+
+        /* Styles for Library Resources Display (Fixed Overlay) */
+        #libraryResourcesDisplay {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Fixed position relative to the viewport */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* Center the element */
+            width: 90%;
+            /* Take up 90% of the viewport width */
+            max-width: 700px;
+            /* Max width for larger screens */
+            height: 90%;
+            /* Take up 90% of the viewport height */
+            max-height: 600px;
+            /* Max height for larger screens */
+            background-color: #ffffff;
+            /* White background for the overlay */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            /* Stronger shadow */
+            z-index: 1000;
+            /* Ensure it's on top of other content */
+            padding: 20px;
+            border-radius: 0.5rem;
+            /* Rounded corners */
+            overflow: auto;
+            /* Scroll if content exceeds height */
+            flex-direction: column;
+            /* Arrange content vertically */
+            align-items: center;
+            /* Center items horizontally */
+            justify-content: flex-start;
+            /* Align content to top */
+        }
+
+        #libraryResourcesDisplay.active {
+            display: flex;
+        }
+
+        /* Styles for Attendance Table (Directly on Dashboard) */
+        #attendanceTableContainer {
+            margin-top: 0;
+            /* Adjust as needed for spacing */
+        }
+
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .attendance-table th,
+        .attendance-table td {
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .attendance-table th {
+            background-color: #f0f4f8;
+            /* Light gray-blue header */
+            font-weight: bold;
+        }
+
+        .attendance-table tbody tr:nth-child(even) {
+            background-color: #fafafa;
+            /* Slightly different background for even rows */
+        }
+
+        .profile-image-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid #6d28d9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .profile-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: none;
+            box-shadow: none;
+            background: transparent;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="header-bg text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-bold rounded-md">Student Dashboard</h1>
+            <nav>
+                <ul class="flex space-x-6">
+
+                    <li><a href="/" class="hover:text-purple-200 transition-colors duration-200 rounded-md">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Welcome Card - Now also houses the profile display -->
+        <div id="welcomeCard" class="card-bg p-6 rounded-lg text-center flex flex-col justify-center items-center h-96">
+            <!-- Initial content of the card -->
+            <div class="initial-content">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 rounded-md">Welcome, Student!</h2>
+                <p class="text-gray-600 mb-6 rounded-md">This is your personalized academic dashboard.</p>
+                <button id="viewProfileBtn" class="btn-primary text-white py-2 px-6 rounded-md font-medium">View
+                    Profile</button>
+            </div>
+
+            <!-- Student Profile Display (Initially hidden) -->
+            <div class="profile-content text-left w-full flex flex-col items-center">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 rounded-md">Student Profile</h2>
+                <div class="profile-image-wrapper">
+                    <img id="studentImage" src="" alt="Student Profile Picture" class="profile-image"
+                        onerror="this.onerror=null;this.src='https://via.placeholder.com/120';">
+                </div>
+                <div class="space-y-3 text-gray-700 w-full">
+                    <p><strong>Registration Number:</strong> <span id="studentRegNo"></span></p>
+                    <p><strong>Name:</strong> <span id="studentName"></span></p>
+                    <p><strong>Date of Birth:</strong> <span id="studentDOB"></span></p>
+                    <p><strong>Branch:</strong> <span id="studentBranch"></span></p>
+                    <p><strong>Department:</strong> <span id="studentDepartment"></span></p>
+                    <p><strong>Phone Number:</strong> <span id="studentPhone"></span></p>
+                    <p><strong>Email ID:</strong> <span id="studentEmail"></span></p>
+
+                </div>
+                <button id="hideProfileBtn" class="btn-primary text-white py-2 px-4 rounded-md font-medium mt-4">Hide
+                    Profile</button>
+            </div>
+        </div>
+        <!-- Upcoming Classes Card with Scroll -->
+        <div class="card-bg p-6 rounded-lg h-96 overflow-y-auto">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 rounded-md">Interview Topics</h2>
+            <ul class="space-y-3">
+                <li class="border-b border-gray-200 pb-2">
+                    <p class="text-gray-700 font-medium rounded-md">Data Structures & Algorithms</p>
+                    <details class="mt-2">
+                        <summary class="cursor-pointer text-purple-600">Important Topics</summary>
+                        <ul class="list-disc list-inside text-gray-600 text-sm">
+                            <li>Arrays & Strings</li>
+                            <li>Linked Lists</li>
+                            <li>Stacks & Queues</li>
+                            <li>Trees & Graphs</li>
+                            <li>Sorting & Searching</li>
+                        </ul>
+                    </details>
+                </li>
+
+                <li class="border-b border-gray-200 pb-2">
+                    <p class="text-gray-700 font-medium rounded-md">Database Management Systems (SQL)</p>
+                    <details class="mt-2">
+                        <summary class="cursor-pointer text-purple-600">Important Topics</summary>
+                        <ul class="list-disc list-inside text-gray-600 text-sm">
+                            <li>DDL, DML, DCL commands</li>
+                            <li>Joins & Subqueries</li>
+                            <li>Normalization & Keys</li>
+                            <li>Transactions & ACID</li>
+                            <li>Indexes & Views</li>
+                        </ul>
+                    </details>
+                </li>
+
+                <li>
+                    <p class="text-gray-700 font-medium rounded-md">Python Programming</p>
+                    <details class="mt-2">
+                        <summary class="cursor-pointer text-purple-600">Important Topics</summary>
+                        <ul class="list-disc list-inside text-gray-600 text-sm">
+                            <li>Data Types & Operators</li>
+                            <li>Functions & Modules</li>
+                            <li>File Handling</li>
+                            <li>OOP in Python</li>
+                            <li>Exception Handling</li>
+                        </ul>
+                    </details>
+                </li>
+                <li>
+                    <p class="text-gray-700 font-medium rounded-md">Operating Systems</p>
+                    <details class="mt-2">
+                        <summary class="cursor-pointer text-purple-600">Important Topics</summary>
+                        <ul class="list-disc list-inside text-gray-600 text-sm">
+                            <li>Processes & Threads</li>
+                            <li>Memory Management</li>
+                            <li>Scheduling</li>
+                            <li>File Systems</li>
+                            <li>Deadlocks & Synchronization</li>
+                        </ul>
+                    </details>
+                </li>
+                <li>
+                    <p class="text-gray-700 font-medium rounded-md">Devops Concepts </p>
+                    <details class="mt-2">
+                        <summary class="cursor-pointer text-purple-600">Important Topics</summary>
+                        <ul class="list-disc list-inside text-gray-600 text-sm">
+                            <li>CI/CD Pipelines</li>
+                            <li>Containerization (Docker)</li>
+                            <li>Orchestration (Kubernetes)</li>
+                            <li>Infrastructure as Code (Terraform)</li>
+                            <li>Monitoring & Logging</li>
+                        </ul>
+                    </details>
+                </li>
+            </ul>
+        </div>
+
+
+
+
+
+        <!-- Attendance Table (Directly on Dashboard) -->
+        <div id="attendanceTableContainer" class="card-bg p-6 rounded-lg h-96 overflow-y-auto">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 rounded-md">Student Attendance Record</h2>
+            <div class="mb-4">
+                <label for="attendanceSemesterSelect" class="block text-gray-700 text-sm font-bold mb-2">Select
+                    Semester:</label>
+                <select id="attendanceSemesterSelect"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <!-- Options will be added by JavaScript -->
+                </select>
+            </div>
+            <div id="semesterAttendanceDetails" class="w-full">
+                <!-- Attendance details will be dynamically inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Announcements Card -->
+        <div class="card-bg p-6 rounded-lg h-96 overflow-y-auto">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 rounded-md">Placement Announcement Y22 & L23 batches
+                (2022-26)
+            </h2>
+            <ul class="space-y-3">
+                <li class="border-b border-gray-200 pb-2">
+                    <p class="text-gray-700 font-medium rounded-md">Exam Schedule Released</p>
+                    <p class="text-gray-500 text-sm rounded-md">Check the academic calendar for details.</p>
+                </li>
+                <li class="border-b border-gray-200 pb-2">
+                    <p class="text-gray-700 font-medium rounded-md">DeltaX Result</p>
+                    <p class="text-gray-500 text-sm rounded-md">No one was selected for the campus drive.</p>
+                </li>
+                <li class="border-b border-gray-200 pb-2">
+                    <p class="text-gray-700 font-medium rounded-md">Afformed Result</p>
+                    <p class="text-gray-500 text-sm rounded-md">No one was selected for the campus drive.</p>
+                </li>
+                <li class="border-b border-gray-200 pb-2">
+                    <p class="text-gray-700 font-medium rounded-md">PlanetSpark Result</p>
+                    <p class="text-gray-500 text-sm rounded-md">9 students were selected for the campus drive.</p>
+                    <ul class="list-disc list-inside text-gray-500 text-sm ml-4">
+                        <li>RehanaBegum - AIML</li>
+                        <li>Mohammad Ali - CSE</li>
+                        <li>Gajji Abhiram - AIML</li>
+                        <li>SatWIKA - CB</li>
+                        <li>Arifa - DS</li>
+                        <li>Anusha - CSE</li>
+                        <li>Bindu - IT</li>
+                        <li>Manisha - IT</li>
+                        <li>Jashuvu - IT</li>
+                    </ul>
+                </li>
+                <li class="border-b border-gray-200 pb-2">
+                    <p class="text-gray-700 font-medium rounded-md">Guest Lecture on AI Ethics</p>
+                    <p class="text-gray-500 text-sm rounded-md">June 15th, 3:00 PM, Auditorium.</p>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Quick Links Card -->
+        <div class="card-bg p-6 rounded-lg col-span-1 md:col-span-2 lg:col-span-1">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 rounded-md">Quick Links</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <a href="#" id="studentPortalLink"
+                    class="block text-center p-3 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors duration-200 text-gray-700"
+                    style="background-color: antiquewhite;">Student
+                    Portal</a>
+                <a href="#" id="libraryResourcesLink"
+                    class="block text-center p-3 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors duration-200 text-gray-700"
+                    style="background-color: antiquewhite;">Library
+                    Resources</a>
+                <a href="#" id="courseCatalogLink"
+                    class="block text-center p-3 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors duration-200 text-gray-700"
+                    style="background-color: antiquewhite;">Course
+                    Catalog</a>
+                <a href="#" id="academicCalendarLink"
+                    class="block text-center p-3 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors duration-200 text-gray-700"
+                    style="background-color: antiquewhite;">Academic
+                    Calendar</a>
+            </div>
+        </div>
+
+        <!-- Marks Memo Display Section -->
+        <div id="marksMemoDisplay" class="card-bg p-6 rounded-lg col-span-full">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 rounded-md">Marks Memo</h2>
+            <div class="mb-4 text-gray-700">
+                <p><strong>Student Name:</strong> <span id="memoStudentName"></span></p>
+                <p><strong>Registration Number:</strong> <span id="memoRegNo"></span></p>
+            </div>
+            <div class="mb-4">
+                <label for="semesterSelect" class="block text-gray-700 text-sm font-bold mb-2">Select Semester:</label>
+                <select id="semesterSelect"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <!-- Options will be added by JavaScript -->
+                </select>
+            </div>
+            <table class="marks-table text-gray-700">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Internal Marks</th>
+                        <th>External Marks</th>
+                        <th>Total Marks</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody id="marksMemoTableBody">
+                    <!-- Marks will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+            <!-- Changed text-right to text-center and added mx-auto and max-w-md for better centering on larger screens -->
+            <div class="mt-4 text-gray-700 text-center mx-auto max-w-md">
+                <p class="mb-1"><strong>Total Marks (Semester):</strong> <span id="semesterTotalMarks"></span></p>
+                <p class="mb-1"><strong>SGPA:</strong> <span id="sgpaDisplay"></span></p>
+                <p><strong>CGPA:</strong> <span id="cgpaDisplay"></span></p>
+            </div>
+            <button id="hideMarksMemoBtn" class="btn-primary text-white py-2 px-4 rounded-md font-medium mt-4">Hide
+                Marks Memo</button>
+        </div>
+
+        <!-- Academic Calendar Display Section (Fixed Overlay with Table) -->
+        <div id="academicCalendarDisplay" class="card-bg p-6 rounded-lg">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 rounded-md text-center">BAPATLA ENGINEERING COLLEGE</h2>
+            <h3 class="text-lg font-semibold text-gray-700 mb-2 text-center">DEPARTMENT OF CYBER SECURITY AND DATA
+                SCIENCE</h3>
+            <h4 class="text-md text-gray-600 mb-4 text-center">3/4 B.TECH CLASS TIME TABLE FOR THE ACADEMIC YEAR 2024-25
+                (VI-SEM)</h4>
+
+            <div class="flex justify-between items-center text-gray-700 mb-4 w-full">
+                <p><strong>BRANCH:</strong> DS</p>
+                <p><strong>SECTION:</strong> 3-DS</p>
+                <p><strong>WEF:</strong> 20-01-2025</p>
+            </div>
+
+            <table class="time-table">
+                <thead>
+                    <tr>
+                        <th>DAY</th>
+                        <th>07:30 AM</th>
+                        <th>08:20 AM</th>
+                        <th>09:10 AM</th>
+                        <th>10:00 AM</th>
+                        <th rowspan="7" class="break-cell">BREAK</th>
+                        <th>10:30 AM</th>
+                        <th>11:20 AM</th>
+                        <th>12:10 PM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>MONDAY</td>
+                        <td>ML</td>
+                        <td>MAD</td>
+                        <td>FSD</td>
+                        <td></td>
+                        <td>BCT</td>
+                        <td>CNS</td>
+                        <td>CD</td>
+                    </tr>
+                    <tr>
+                        <td>TUESDAY</td>
+                        <td colspan="3">MAD-B2-RPL-22/ML-B1-RPL-21</td>
+                        <td></td>
+                        <td>CD</td>
+                        <td>ML</td>
+                        <td>MAD</td>
+                    </tr>
+                    <tr>
+                        <td>WEDNESDAY</td>
+                        <td>MAD</td>
+                        <td>BCT</td>
+                        <td>CNS</td>
+                        <td></td>
+                        <td>CRT</td>
+                        <td>CRT</td>
+                        <td>ML</td>
+                    </tr>
+                    <tr>
+                        <td>THURSDAY</td>
+                        <td>CD</td>
+                        <td>CNS</td>
+                        <td>FSD</td>
+                        <td></td>
+                        <td colspan="3">FSD-B2-RPL21/MAD-B1-RPL-22</td>
+                    </tr>
+                    <tr>
+                        <td>FRIDAY</td>
+                        <td>BCT</td>
+                        <td>CD</td>
+                        <td>CNS</td>
+                        <td></td>
+                        <td>MAD</td>
+                        <td>ML</td>
+                        <td>IC</td>
+                    </tr>
+                    <tr>
+                        <td>SATURDAY</td>
+                        <td>IC</td>
+                        <td>BCT</td>
+                        <td>CRT</td>
+                        <td></td>
+                        <td colspan="3">FSD-B1-RPL-21/ML-B2-RPL-22</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-2 mt-8 w-full text-center">SUBJECTWISE FACULTY DETAILS
+            </h3>
+            <table class="time-table faculty-details">
+                <thead>
+                    <tr>
+                        <th>SUBJECT TITLE</th>
+                        <th>DEPT</th>
+                        <th>FACULTY NAME</th>
+                        <th>PHONE NUMBER</th>
+                        <th>SUBJECT TITLE</th>
+                        <th>DEPT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>BCT</td>
+                        <td>CB,DS&AIML</td>
+                        <td>Mr.V.CHAKRADHAR</td>
+                        <td>9490449894</td>
+                        <td>MAD</td>
+                        <td>CB,DS&AIML</td>
+                    </tr>
+                    <tr>
+                        <td>MAD</td>
+                        <td>CB,DS&AIML</td>
+                        <td>Mrs. M. RISHITHA</td>
+                        <td>9985624323</td>
+                        <td>ML</td>
+                        <td>CB,DS&AIML</td>
+                    </tr>
+                    <tr>
+                        <td>ML</td>
+                        <td>CB,DS&AIML</td>
+                        <td>Mr.N. VENKATESWARA RAC</td>
+                        <td>9989017378</td>
+                        <td>FSD</td>
+                        <td>CB,DS&AIML</td>
+                    </tr>
+                    <tr>
+                        <td>CD</td>
+                        <td>CB,DS&AIML</td>
+                        <td>Dr.PRAMESH BABU</td>
+                        <td>9440318231</td>
+                        <td colspan="2"></td>
+                    </tr>
+                    <tr>
+                        <td>CNS</td>
+                        <td>CB,DS&AIML</td>
+                        <td>Mr.MD.ISMAIL KHAN</td>
+                        <td>9177813594</td>
+                        <td colspan="2"></td>
+                    </tr>
+                    <tr>
+                        <td>FSD</td>
+                        <td>CB,DS&AIML</td>
+                        <td>Mr.R. KARTHEEK</td>
+                        <td>7382880136</td>
+                        <td colspan="2"></td>
+                    </tr>
+                    <tr>
+                        <td>IC</td>
+                        <td>CB,DS&AIML</td>
+                        <td>Mr TSR</td>
+                        <td>9440242535</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="text-gray-700 mt-4 w-full text-center"><strong>NAME OF THE SECTION CO-ORDINATOR:</strong> Mr. N.
+                VENKATESWARA RAC</p>
+
+            <button id="hideCalendarBtn" class="btn-primary text-white py-2 px-4 rounded-md font-medium mt-4">Hide
+                Calendar</button>
+        </div>
+
+        <!-- Course Catalog Display Section (Fixed Overlay) -->
+        <div id="courseCatalogDisplay" class="card-bg p-6 rounded-lg">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 rounded-md text-center">Course Catalog</h2>
+            <div id="semesterCourseDetails" class="w-full">
+                <!-- Semester details will be dynamically inserted here -->
+            </div>
+            <button id="hideCourseCatalogBtn" class="btn-primary text-white py-2 px-4 rounded-md font-medium mt-4">Hide
+                Course Catalog</button>
+        </div>
+
+        <!-- Library Resources Display Section (New Fixed Overlay) -->
+        <div id="libraryResourcesDisplay" class="card-bg p-6 rounded-lg">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 rounded-md text-center">Library Resources: Computer PDF
+                Courses</h2>
+            <ul id="computerCoursesList" class="list-disc list-inside text-gray-600 w-full pl-4">
+                <!-- Course PDFs will be dynamically inserted here -->
+            </ul>
+            <button id="hideLibraryResourcesBtn"
+                class="btn-primary text-white py-2 px-4 rounded-md font-medium mt-4">Hide Resources</button>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white p-4 text-center mt-8 shadow-inner">
+        <p class="rounded-md">&copy; 2025 Bapatla Engineering College. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const welcomeCard = document.getElementById('welcomeCard');
+            const viewProfileBtn = document.getElementById('viewProfileBtn');
+            const hideProfileBtn = document.getElementById('hideProfileBtn');
+            const initialContent = welcomeCard.querySelector('.initial-content');
+            const profileContent = welcomeCard.querySelector('.profile-content');
+
+            // References for Student Profile
+            const studentName = document.getElementById('studentName');
+            const studentBranch = document.getElementById('studentBranch');
+            const studentDepartment = document.getElementById('studentDepartment');
+            const studentPhone = document.getElementById('studentPhone');
+            const studentEmail = document.getElementById('studentEmail');
+            const studentRegNo = document.getElementById('studentRegNo');
+            const studentDOB = document.getElementById('studentDOB');
+            const studentImage = document.getElementById('studentImage'); // Reference for the image
+
+            // References for Marks Memo
+            const studentPortalLink = document.getElementById('studentPortalLink');
+            const marksMemoDisplay = document.getElementById('marksMemoDisplay');
+            const hideMarksMemoBtn = document.getElementById('hideMarksMemoBtn');
+            const memoStudentName = document.getElementById('memoStudentName');
+            const memoRegNo = document.getElementById('memoRegNo');
+            const marksMemoTableBody = document.getElementById('marksMemoTableBody');
+            const semesterSelect = document.getElementById('semesterSelect');
+            const semesterTotalMarksDisplay = document.getElementById('semesterTotalMarks');
+            const sgpaDisplay = document.getElementById('sgpaDisplay');
+            const cgpaDisplay = document.getElementById('cgpaDisplay');
+
+            // References for Academic Calendar
+            const academicCalendarLink = document.getElementById('academicCalendarLink');
+            const academicCalendarDisplay = document.getElementById('academicCalendarDisplay');
+            const hideCalendarBtn = document.getElementById('hideCalendarBtn');
+
+            // References for Course Catalog
+            const courseCatalogLink = document.getElementById('courseCatalogLink');
+            const courseCatalogDisplay = document.getElementById('courseCatalogDisplay');
+            const hideCourseCatalogBtn = document.getElementById('hideCourseCatalogBtn');
+            const semesterCourseDetails = document.getElementById('semesterCourseDetails');
+
+            // References for Library Resources
+            const libraryResourcesLink = document.getElementById('libraryResourcesLink');
+            const libraryResourcesDisplay = document.getElementById('libraryResourcesDisplay');
+            const hideLibraryResourcesBtn = document.getElementById('hideLibraryResourcesBtn');
+            const computerCoursesList = document.getElementById('computerCoursesList');
+
+            // References for Attendance
+            const attendanceTableContainer = document.getElementById('attendanceTableContainer');
+            const semesterAttendanceDetails = document.getElementById('semesterAttendanceDetails');
+            const attendanceSemesterSelect = document.getElementById('attendanceSemesterSelect');
+
+
+            // Sample student data
+            const studentData = {
+                name: "Avinash Reddy",
+                branch: "Data Science",
+                department: "Computer Science Engineering (Data Science)",
+                phoneNumber: "9876543210",
+                email: "avinash.y@example.com",
+                registrationNumber: "21B91A0501",
+                dateOfBirth: "2003-01-15",
+                imageUrl: "passport%20pic.jpg"
+            };
+
+            // Grade to Grade Point Mapping (Assuming 4 credits per subject for simplicity)
+            const gradePoints = {
+                'O': 10,
+                'A+': 9,
+                'A': 8,
+                'B+': 7,
+                'B': 6,
+                'C': 5,
+                'C-': 4, // Mapping C- to 4 based on typical grading
+                'P': 4, // Pass
+                'F': 0 // Fail
+            };
+
+            // Sample marks data for up to 5 semesters
+            const allMarksData = {
+                studentName: "Avinash Yakkanti",
+                registrationNumber: "21B91A0501",
+                semesters: [
+                    {
+                        semester: 1,
+                        totalCredits: 20, // Sum of credits for this semester
+                        subjects: [
+                            { name: "Mathematics-I", internal: 25, external: 60, total: 85, grade: "A", credits: 4 },
+                            { name: "Physics", internal: 22, external: 55, total: 77, grade: "B+", credits: 4 },
+                            { name: "Programming for Problem Solving", internal: 24, external: 65, total: 89, grade: "A+", credits: 4 },
+                            { name: "English", internal: 20, external: 45, total: 65, grade: "C", credits: 4 },
+                            { name: "Engineering Graphics", internal: 23, external: 58, total: 81, grade: "A", credits: 4 }
+                        ]
+                    },
+                    {
+                        semester: 2,
+                        totalCredits: 20,
+                        subjects: [
+                            { name: "Mathematics-II", internal: 24, external: 58, total: 82, grade: "A", credits: 4 },
+                            { name: "Chemistry", internal: 21, external: 50, total: 71, grade: "B", credits: 4 },
+                            { name: "Data Structures", internal: 23, external: 62, total: 85, grade: "A", credits: 4 },
+                            { name: "Environmental Science", internal: 18, external: 40, total: 58, grade: "C-", credits: 4 },
+                            { name: "Basic Electrical Engg.", internal: 20, external: 55, total: 75, grade: "B+", credits: 4 }
+                        ]
+                    },
+                    {
+                        semester: 3,
+                        totalCredits: 20,
+                        subjects: [
+                            { name: "Discrete Mathematics", internal: 25, external: 68, total: 93, grade: "A+", credits: 4 },
+                            { name: "Object Oriented Programming", internal: 24, external: 60, total: 84, grade: "A", credits: 4 },
+                            { name: "Computer Organization", internal: 22, external: 55, total: 77, grade: "B+", credits: 4 },
+                            { name: "Operating Systems", internal: 23, external: 57, total: 80, grade: "A", credits: 4 },
+                            { name: "Probability & Statistics", internal: 19, external: 52, total: 71, grade: "B", credits: 4 }
+                        ]
+                    },
+                    {
+                        semester: 4,
+                        totalCredits: 20,
+                        subjects: [
+                            { name: "Design & Analysis of Algorithms", internal: 25, external: 70, total: 95, grade: "A+", credits: 4 },
+                            { name: "Database Management Systems", internal: 24, external: 65, total: 89, grade: "A+", credits: 4 },
+                            { name: "Software Engineering", internal: 22, external: 58, total: 80, grade: "A", credits: 4 },
+                            { name: "Formal Languages & Automata", internal: 21, external: 50, total: 71, grade: "B", credits: 4 },
+                            { name: "Microprocessors", internal: 20, external: 55, total: 75, grade: "B+", credits: 4 }
+                        ]
+                    },
+                    {
+                        semester: 5,
+                        totalCredits: 20,
+                        subjects: [
+                            { name: "Computer Networks", internal: 24, external: 63, total: 87, grade: "A+", credits: 4 },
+                            { name: "Web Technologies", internal: 23, external: 60, total: 83, grade: "A", credits: 4 },
+                            { name: "Artificial Intelligence", internal: 25, external: 68, total: 93, grade: "A+", credits: 4 },
+                            { name: "Data Warehousing & Mining", internal: 22, external: 55, total: 77, grade: "B+", credits: 4 },
+                            { name: "Machine Learning Concepts", internal: 23, external: 58, total: 81, grade: "A", credits: 4 }
+                        ]
+                    }
+                ]
+            };
+
+            // Sample data for Computer PDF Courses
+            const computerCourses = [
+                { name: "E-commerce Fundamentals", link: "#" },
+                { name: "Introduction to Data Science", link: "#" },
+                { name: "Artificial Intelligence Basics", link: "#" },
+                { name: "Machine Learning for Beginners", link: "#" },
+                { name: "Web Development (HTML/CSS/JS)", link: "#" },
+                { name: "Database Management Systems", link: "#" },
+                { name: "Cybersecurity Essentials", link: "#" },
+                { name: "Cloud Computing Overview", link: "#" },
+            ];
+
+            // Sample Attendance Data
+            const attendanceData = {
+                studentName: "Avinash Yakkanti",
+                registrationNumber: "21B91A0501",
+                semesters: [
+                    {
+                        semester: 1,
+                        subjects: [
+                            { name: "Mathematics-I", totalClasses: 50, classesAttended: 45 },
+                            { name: "Physics", totalClasses: 50, classesAttended: 40 },
+                            { name: "Programming for Problem Solving", totalClasses: 60, classesAttended: 58 },
+                            { name: "English", totalClasses: 40, classesAttended: 35 },
+                            { name: "Engineering Graphics", totalClasses: 40, classesAttended: 38 }
+                        ]
+                    },
+                    {
+                        semester: 2,
+                        subjects: [
+                            { name: "Mathematics-II", totalClasses: 55, classesAttended: 50 },
+                            { name: "Chemistry", totalClasses: 50, classesAttended: 42 },
+                            { name: "Data Structures", totalClasses: 60, classesAttended: 55 },
+                            { name: "Environmental Science", totalClasses: 40, classesAttended: 30 },
+                            { name: "Basic Electrical Engg.", totalClasses: 50, classesAttended: 48 }
+                        ]
+                    },
+                    {
+                        semester: 3,
+                        subjects: [
+                            { name: "Discrete Mathematics", totalClasses: 50, classesAttended: 48 },
+                            { name: "Object Oriented Programming", totalClasses: 60, classesAttended: 55 },
+                            { name: "Computer Organization", totalClasses: 50, classesAttended: 40 },
+                            { name: "Operating Systems", totalClasses: 55, classesAttended: 50 },
+                            { name: "Probability & Statistics", totalClasses: 45, classesAttended: 38 }
+                        ]
+                    },
+                    {
+                        semester: 4,
+                        subjects: [
+                            { name: "Design & Analysis of Algorithms", totalClasses: 60, classesAttended: 58 },
+                            { name: "Database Management Systems", totalClasses: 55, classesAttended: 52 },
+                            { name: "Software Engineering", totalClasses: 50, classesAttended: 45 },
+                            { name: "Formal Languages & Automata", totalClasses: 45, classesAttended: 39 },
+                            { name: "Microprocessors", totalClasses: 50, classesAttended: 46 }
+                        ]
+                    },
+                    {
+                        semester: 5,
+                        subjects: [
+                            { name: "Computer Networks", totalClasses: 55, classesAttended: 50 },
+                            { name: "Web Technologies", totalClasses: 60, classesAttended: 55 },
+                            { name: "Artificial Intelligence", totalClasses: 60, classesAttended: 58 },
+                            { name: "Data Warehousing & Mining", totalClasses: 50, classesAttended: 42 },
+                            { name: "Machine Learning Concepts", totalClasses: 55, classesAttended: 50 }
+                        ]
+                    }
+                ]
+            };
+
+
+            // Function to calculate SGPA for a given set of subjects
+            function calculateSGPA(subjects) {
+                let totalGradePoints = 0;
+                let totalCredits = 0;
+                subjects.forEach(subject => {
+                    const gp = gradePoints[subject.grade];
+                    if (gp !== undefined) {
+                        totalGradePoints += (gp * subject.credits);
+                        totalCredits += subject.credits;
+                    }
+                });
+                return totalCredits > 0 ? (totalGradePoints / totalCredits).toFixed(2) : 'N/A';
+            }
+
+            // Function to calculate CGPA up to a specific semester
+            function calculateCGPA(semestersData, currentSemesterNumber) {
+                let cumulativeGradePoints = 0;
+                let cumulativeCredits = 0;
+
+                for (let i = 0; i < currentSemesterNumber; i++) {
+                    const semester = semestersData.semesters[i];
+                    if (semester) {
+                        semester.subjects.forEach(subject => {
+                            const gp = gradePoints[subject.grade];
+                            if (gp !== undefined) {
+                                cumulativeGradePoints += (gp * subject.credits);
+                                cumulativeCredits += subject.credits;
+                            }
+                        });
+                    }
+                }
+                return cumulativeCredits > 0 ? (cumulativeGradePoints / cumulativeCredits).toFixed(2) : 'N/A';
+            }
+
+
+            // Function to display marks for a given semester
+            function displayMarksMemo(semesterNumber) {
+                const semesterData = allMarksData.semesters.find(sem => sem.semester === semesterNumber);
+
+                if (semesterData) {
+                    memoStudentName.textContent = allMarksData.studentName;
+                    memoRegNo.textContent = allMarksData.registrationNumber;
+
+                    // Clear previous marks data
+                    marksMemoTableBody.innerHTML = '';
+                    let semesterTotal = 0;
+
+                    // Add subject rows
+                    semesterData.subjects.forEach(subject => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${subject.name}</td>
+                            <td>${subject.internal}</td>
+                            <td>${subject.external}</td>
+                            <td>${subject.total}</td>
+                            <td>${subject.grade}</td>
+                        `;
+                        marksMemoTableBody.appendChild(row);
+                        semesterTotal += subject.total;
+                    });
+
+                    // Display Total Marks for the semester
+                    semesterTotalMarksDisplay.textContent = semesterTotal;
+
+                    // Calculate and display SGPA
+                    const sgpa = calculateSGPA(semesterData.subjects);
+                    sgpaDisplay.textContent = sgpa;
+
+                    // Calculate and display CGPA
+                    const cgpa = calculateCGPA(allMarksData, semesterNumber);
+                    cgpaDisplay.textContent = cgpa;
+
+                }
+            }
+
+            // Function to display course catalog
+            function displayCourseCatalog() {
+                semesterCourseDetails.innerHTML = ''; // Clear previous content
+
+                allMarksData.semesters.forEach(sem => {
+                    const semesterDiv = document.createElement('div');
+                    semesterDiv.className = 'mb-4 border-b border-gray-200 pb-4'; // Tailwind classes for spacing/border
+
+                    const semesterHeading = document.createElement('h3');
+                    semesterHeading.className = 'text-lg font-semibold text-gray-700 mb-2';
+                    semesterHeading.textContent = `Semester ${sem.semester}`;
+                    semesterDiv.appendChild(semesterHeading);
+
+                    const ul = document.createElement('ul');
+                    ul.className = 'list-disc list-inside text-gray-600';
+
+                    sem.subjects.forEach(subject => {
+                        const li = document.createElement('li');
+                        li.textContent = `${subject.name} (Grade: ${subject.grade}, Total Marks: ${subject.total})`;
+                        ul.appendChild(li);
+                    });
+                    semesterDiv.appendChild(ul);
+                    semesterCourseDetails.appendChild(semesterDiv);
+                });
+            }
+
+            // Function to display library resources (computer courses)
+            function displayLibraryResources() {
+                computerCoursesList.innerHTML = ''; // Clear previous content
+
+                computerCourses.forEach(course => {
+                    const li = document.createElement('li');
+                    const link = document.createElement('a');
+                    link.href = course.link;
+                    link.textContent = course.name;
+                    link.className = 'text-blue-600 hover:underline';
+                    link.target = '_blank'; // Open in a new tab
+                    li.appendChild(link);
+                    computerCoursesList.appendChild(li);
+                });
+            }
+
+            // Function to display attendance for a specific semester
+            function displayAttendance(semesterNumber) {
+                const semesterData = attendanceData.semesters.find(sem => sem.semester === semesterNumber);
+
+                if (semesterData) {
+                    semesterAttendanceDetails.innerHTML = ''; // Clear previous content
+
+                    const table = document.createElement('table');
+                    table.className = 'attendance-table';
+
+                    const thead = document.createElement('thead');
+                    thead.innerHTML = `
+                        <tr>
+                            <th>Subject</th>
+                            <th>Total Classes</th>
+                            <th>Classes Attended</th>
+                            <th>Attendance %</th>
+                        </tr>
+                    `;
+                    table.appendChild(thead);
+
+                    const tbody = document.createElement('tbody');
+                    semesterData.subjects.forEach(subject => {
+                        const attendancePercentage = (subject.totalClasses > 0) ? (subject.classesAttended / subject.totalClasses * 100).toFixed(2) : 'N/A';
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${subject.name}</td>
+                            <td>${subject.totalClasses}</td>
+                            <td>${subject.classesAttended}</td>
+                            <td>${attendancePercentage}%</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                    table.appendChild(tbody);
+                    semesterAttendanceDetails.appendChild(table);
+                } else {
+                    semesterAttendanceDetails.innerHTML = '<p class="text-gray-500">Attendance data not available for this semester.</p>';
+                }
+            }
+
+
+            // Populate semester dropdown for Marks Memo
+            allMarksData.semesters.forEach(sem => {
+                const option = document.createElement('option');
+                option.value = sem.semester;
+                option.textContent = `Semester ${sem.semester}`;
+                semesterSelect.appendChild(option);
+            });
+
+            // Populate semester dropdown for Attendance
+            attendanceData.semesters.forEach(sem => {
+                const option = document.createElement('option');
+                option.value = sem.semester;
+                option.textContent = `Semester ${sem.semester}`;
+                attendanceSemesterSelect.appendChild(option);
+            });
+
+            // Initial display of attendance for the first semester on page load
+            if (attendanceData.semesters.length > 0) {
+                attendanceSemesterSelect.value = attendanceData.semesters[0].semester;
+                displayAttendance(attendanceData.semesters[0].semester);
+            }
+
+            // Event listener for Attendance semester dropdown change
+            attendanceSemesterSelect.addEventListener('change', function () {
+                const selectedSemester = parseInt(this.value);
+                displayAttendance(selectedSemester);
+            });
+
+
+            // Event listener for View Profile button
+            viewProfileBtn.addEventListener('click', function () {
+                console.log("Clicked: viewProfileBtn");
+                // Populate the profile display with data
+                studentName.textContent = studentData.name;
+                studentBranch.textContent = studentData.branch;
+                studentDepartment.textContent = studentData.department;
+                studentPhone.textContent = studentData.phoneNumber;
+                studentEmail.textContent = studentData.email;
+                studentRegNo.textContent = studentData.registrationNumber;
+                studentDOB.textContent = studentData.dateOfBirth;
+                studentImage.src = studentData.imageUrl; // Set the image source
+
+                // Add 'profile-active' class to the welcome card to show profile and hide initial
+                welcomeCard.classList.add('profile-active');
+
+                // Ensure other displays are hidden
+                marksMemoDisplay.classList.remove('active');
+                academicCalendarDisplay.classList.remove('active');
+                courseCatalogDisplay.classList.remove('active');
+                libraryResourcesDisplay.classList.remove('active');
+            });
+
+            // Event listener for Hide Profile button
+            hideProfileBtn.addEventListener('click', function () {
+                console.log("Clicked: hideProfileBtn");
+                // Remove 'profile-active' class to hide profile and show initial
+                welcomeCard.classList.remove('profile-active');
+            });
+
+            // Event listener for Student Portal link
+            studentPortalLink.addEventListener('click', function (event) {
+                event.preventDefault(); // Prevent default link behavior
+                console.log("Clicked:", this.id);
+
+                // Display the marks memo section
+                marksMemoDisplay.classList.add('active');
+
+                // Ensure other displays are hidden
+                welcomeCard.classList.remove('profile-active');
+                academicCalendarDisplay.classList.remove('active');
+                courseCatalogDisplay.classList.remove('active');
+                libraryResourcesDisplay.classList.remove('active');
+
+                // Display marks for the first semester by default when opening the memo
+                semesterSelect.value = 1; // Set dropdown to 1st semester
+                displayMarksMemo(1);
+            });
+
+            // Event listener for semester dropdown change (Marks Memo)
+            semesterSelect.addEventListener('change', function () {
+                console.log("Changed semester select to:", this.value);
+                const selectedSemester = parseInt(this.value);
+                displayMarksMemo(selectedSemester);
+            });
+
+            // Event listener for Hide Marks Memo button
+            hideMarksMemoBtn.addEventListener('click', function () {
+                console.log("Clicked: hideMarksMemoBtn");
+                marksMemoDisplay.classList.remove('active');
+            });
+
+            // Event listener for Academic Calendar link
+            academicCalendarLink.addEventListener('click', function (event) {
+                event.preventDefault(); // Prevent default link behavior
+                console.log("Clicked:", this.id);
+
+                // Display the academic calendar section
+                academicCalendarDisplay.classList.add('active');
+
+                // Ensure other displays are hidden
+                welcomeCard.classList.remove('profile-active');
+                marksMemoDisplay.classList.remove('active');
+                courseCatalogDisplay.classList.remove('active');
+                libraryResourcesDisplay.classList.remove('active');
+            });
+
+            // Event listener for Hide Calendar button
+            hideCalendarBtn.addEventListener('click', function () {
+                console.log("Clicked: hideCalendarBtn");
+                academicCalendarDisplay.classList.remove('active');
+            });
+
+            // Event listener for Course Catalog link
+            courseCatalogLink.addEventListener('click', function (event) {
+                event.preventDefault(); // Prevent default link behavior
+                console.log("Clicked:", this.id);
+
+                displayCourseCatalog(); // Populate and display the course catalog
+
+                // Display the course catalog section
+                courseCatalogDisplay.classList.add('active');
+
+                // Ensure other displays are hidden
+                welcomeCard.classList.remove('profile-active');
+                marksMemoDisplay.classList.remove('active');
+                academicCalendarDisplay.classList.remove('active');
+                libraryResourcesDisplay.classList.remove('active');
+            });
+
+            // Event listener for Hide Course Catalog button
+            hideCourseCatalogBtn.addEventListener('click', function () {
+                console.log("Clicked: hideCourseCatalogBtn");
+                courseCatalogDisplay.classList.remove('active');
+            });
+
+            // Event listener for Library Resources link
+            libraryResourcesLink.addEventListener('click', function (event) {
+                event.preventDefault(); // Prevent default link behavior
+                console.log("Clicked:", this.id);
+
+                displayLibraryResources(); // Populate and display the library resources
+
+                // Display the library resources section
+                libraryResourcesDisplay.classList.add('active');
+
+                // Ensure other displays are hidden
+                welcomeCard.classList.remove('profile-active');
+                marksMemoDisplay.classList.remove('active');
+                academicCalendarDisplay.classList.remove('active');
+                courseCatalogDisplay.classList.remove('active');
+            });
+
+            // Event listener for Hide Library Resources button
+            hideLibraryResourcesBtn.addEventListener('click', function () {
+                console.log("Clicked: hideLibraryResourcesBtn");
+                libraryResourcesDisplay.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+
+</html>

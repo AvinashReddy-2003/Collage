@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="html,css,javascript" name="keywords" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>bec.co.in</title>
+    <link href="icon" type="image/x-icon"
+        href="https://www.google.com/imgres?q=bapatla%20engineering%20college%20logo&imgurl=https%3A%2F%2Flookaside.fbsbx.com%2Flookaside%2Fcrawler%2Fmedia%2F%3Fmedia_id%3D100063863182337&imgrefurl=https%3A%2F%2Fwww.facebook.com%2Fbecbapatlaofficial%2F&docid=a35UpXZqksLacM&tbnid=jItWhKWExny49M&vet=2ahUKEwiKreWwxdqNAxU7ZfUHHZxtIbwQM3oECGUQAA..i&w=382&h=382&hcb=2&ved=2ahUKEwiKreWwxdqNAxU7ZfUHHZxtIbwQM3oECGUQAA" />
+    <link href="index1.css" rel="stylesheet">
+    <script src="chatgpt.js"></script>
+    <style>
+        body {
+            background-color: black;
+        }
+
+        ul {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+            background-color: #1e1d1d;
+        }
+
+        li a {
+            float: right;
+        }
+
+        /* Updated image styles for responsiveness */
+        img {
+            max-width: 100%;
+            height: 190px;
+            display: block;
+        }
+
+        /* Added specific styles for the logo on the navigation bar */
+        nav img {
+            float: left;
+            display: block;
+            padding: 2px;
+            width: 50px;
+            height: 50px;
+        }
+
+        li a {
+            display: block;
+            color: rgb(153, 33, 33);
+            padding: 20px;
+        }
+
+        li a:hover {
+            background-color: purple;
+            color: yellow;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+        }
+
+        p {
+            color: white;
+            text-align: center;
+        }
+
+        div.myclass1,
+        div.myclass2 {
+            width: 100%;
+            display: flex;
+            /* Use flexbox for better responsive layout */
+            flex-wrap: wrap;
+            /* Allow items to wrap to the next line */
+            justify-content: center;
+            /* Center items when they wrap */
+            gap: 20px;
+            /* Add some space between the boxes */
+        }
+
+        div.myclass1 div,
+        div.myclass2 div {
+            width: 33%;
+            /* Adjusted for better spacing */
+            max-width: 420px;
+            display: inline-block;
+            border: 1px solid rgb(159, 96, 41);
+            box-sizing: border-box;
+            /* Include padding and border in the element's total width */
+        }
+
+        .loginform {
+            background-color: rgb(90, 62, 86);
+            color: white;
+            width: 230px;
+            position: absolute;
+            border: 1px solid white;
+            border-left-width: 2px;
+            left: 400px;
+            padding-left: 3px;
+            border-left-width: 3px;
+            margin-left: 150px;
+            margin-top: 30px;
+            padding-bottom: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .loginform2 {
+            background-color: rgb(252, 83, 246);
+            color: white;
+            width: 230px;
+            height: 250px;
+            position: absolute;
+            border: 2px solid white;
+            margin-top: 30px;
+            margin-left: 50%;
+        }
+
+        .describe {
+            text-align: center;
+            color: blueviolet;
+            background-color: antiquewhite;
+        }
+
+        /* Modal Overlay - Hides by default */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Modal Container */
+        .modal-container {
+            background-color: #fefefe;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        }
+
+        /* Close button for the modal */
+        .close-btn {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        /* Styles for the new Department Details section */
+        #department-details-container {
+            display: none;
+            /* Hidden by default */
+            padding: 20px;
+            color: white;
+        }
+
+        .department-section {
+            margin-bottom: 40px;
+            border: 1px solid #444;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #2a2a2a;
+        }
+
+        .department-section h2 {
+            text-align: center;
+            color: #ffcc00;
+            /* Yellow-gold color for department names */
+        }
+
+        .department-section img {
+            display: block;
+            margin: 20px auto;
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .department-section h3 {
+            color: #99ff99;
+            /* Light green for subheadings */
+        }
+
+        .department-section ul {
+            list-style-type: none;
+            padding: 0;
+            background-color: transparent;
+            /* Override the default ul style */
+            overflow: visible;
+            /* Override the default ul style */
+        }
+
+        .department-section ul li {
+            background-color: #333;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .department-section p {
+            text-align: left;
+        }
+
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            ul {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            li a {
+                float: none;
+                padding: 10px;
+            }
+
+            div.myclass1 div,
+            div.myclass2 div {
+                width: 100%;
+                /* Full width for smaller screens */
+                display: block;
+            }
+
+            .loginform,
+            .loginform2 {
+                position: relative;
+                margin: 10px auto;
+                left: 0;
+                right: 0;
+            }
+
+            /* Ensured images are responsive on smaller screens */
+            img {
+                float: none;
+                display: block;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            h1,
+            p {
+                font-size: 16px;
+            }
+
+            button,
+            input {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <ul id="mylist" type="none">
+            <li><a href="#HOME">HOME</a></li>
+            <li><a href="#CONTACT">CONTACT</a></li>
+            <li><a href="#" id="about-link">ABOUT</a></li>
+            <li><a href="#department-details" id="details-link">DETAILS</a></li>
+            <li><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRi94Xv3s28hSeT2Byljkrp3snR_T2ELucoQA&s"
+                    alt="cannot open" style="padding-top: 6px; padding-left:7px;">
+            </li>
+        </ul>
+    </nav>
+    <div class="myclass">
+        <img alt="cannot open"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPCxnckVaHvL32jC2GudQeuuNCJfIRw5mzPA&s"
+            width="100%" />
+    </div>
+    <h1>Bapatla Engineering Collage</h1>
+    <p>Bapatla Engineering College is a private engineering college and is one of the seven educational
+        institutions<br />
+        sponsored by the Bapatla Education Society. BEC was established in 1981. The founder president for this
+        institute is Yarlagadda Krishna Murthy. It is located in Bapatla district.
+    </p>
+
+    <div id="about-modal" class="modal-overlay">
+        <div class="modal-container">
+            <span class="close-btn">&times;</span>
+            <h2 style="color: black; text-align: center;">About Bapatla Engineering College</h2>
+            <p style="color: black; text-align: left;">
+                Bapatla Engineering College (BEC) is a private, autonomous engineering college established in 1981 by
+                the Bapatla Education Society. Located in Bapatla, the college has been a leader in technical education
+                for over four decades, offering a wide range of undergraduate and postgraduate programs. It is known for
+                its strong academic curriculum, modern infrastructure, and a focus on research and innovation.
+            </p>
+        </div>
+    </div>
+
+    <div id="department-details-container">
+        <h1 style="text-align: center; color: #ffcc00;">Department Details</h1>
+
+        <div id="cse-department" class="department-section">
+            <h2>Computer Science and Engineering (CSE)</h2>
+            <p>The CSE department is a hub for innovation, focusing on the latest technologies in software and computer
+                systems.</p>
+            <h3>Placements:</h3>
+            <p><strong>Placement Percentage (2023-24):</strong> Approximately 51.56%</p>
+            <p><strong>Top Recruiters:</strong> TCS, Wipro, Infosys, Accenture</p>
+            <h3>Technologies Used:</h3>
+            <ul>
+                <li><strong>Programming Languages:</strong> C, C++, Java, Python</li>
+                <li><strong>Databases:</strong> SQL, NoSQL</li>
+                <li><strong>Web Development:</strong> HTML, CSS, JavaScript</li>
+                <li><strong>Emerging Tech:</strong> Data Science, AI & Machine Learning, Cyber Security</li>
+            </ul>
+            <img src="http://www.becbapatla.ac.in:8080/ImgSlider/images/HomePageGallery/4_BEC_GEB.JPG"
+                alt="Computer Science Department">
+        </div>
+
+        <div id="ece-department" class="department-section">
+            <h2>Electronics and Communication Engineering (ECE)</h2>
+            <p>ECE focuses on the design, development, and maintenance of electronic equipment and communication
+                systems.</p>
+            <h3>Placements:</h3>
+            <p><strong>Placement Percentage (2023-24):</strong> Approximately 40.22%</p>
+            <p><strong>Top Recruiters:</strong> Bosch, Tech Mahindra, Wipro</p>
+            <h3>Technologies Used:</h3>
+            <ul>
+                <li><strong>Embedded Systems:</strong> Microcontrollers (Arduino, Raspberry Pi)</li>
+                <li><strong>Signal Processing:</strong> MATLAB, Simulink</li>
+                <li><strong>VLSI Design:</strong> VHDL, Verilog</li>
+                <li><strong>Communication:</strong> Wireless and cellular networks</li>
+            </ul>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjbrzjwPBZMev7zEMQbXyhAbY0FYaGY14N4g&s"
+                alt="Electronics and Communication Department">
+        </div>
+
+        <div id="it-department" class="department-section">
+            <h2>Information Technology (IT)</h2>
+            <p>The IT department prepares students for careers in software development, data management, and IT
+                services.</p>
+            <h3>Placements:</h3>
+            <p><strong>Placement Percentage (2023-24):</strong> Approximately 40%</p>
+            <p><strong>Top Recruiters:</strong> IBM, Oracle, Accenture</p>
+            <h3>Technologies Used:</h3>
+            <ul>
+                <li><strong>Cloud Computing:</strong> AWS, Microsoft Azure</li>
+                <li><strong>Networking:</strong> Cisco, networking protocols</li>
+                <li><strong>Cybersecurity:</strong> Ethical hacking, network security</li>
+                <li><strong>Database Management:</strong> SQL, MongoDB</li>
+            </ul>
+            <img src="data:image/jpeg;base64,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"
+                alt="Information Technology Department">
+        </div>
+
+        <div id="mech-department" class="department-section">
+            <h2>Mechanical Engineering</h2>
+            <p>This department focuses on the design and production of mechanical tools, engines, and machines.</p>
+            <h3>Placements:</h3>
+            <p><strong>Placement Percentage (2023-24):</strong> Approximately 36.96%</p>
+            <p><strong>Top Recruiters:</strong> L&T, Mahindra, Tata Motors</p>
+            <h3>Technologies Used:</h3>
+            <ul>
+                <li><strong>CAD Software:</strong> AutoCAD, SolidWorks, ProE</li>
+                <li><strong>Analysis Tools:</strong> ANSYS, MATLAB</li>
+                <li><strong>Manufacturing:</strong> CNC machines, 3D printing</li>
+                <li><strong>Robotics:</strong> KUKA robots (as mentioned in college facilities)</li>
+            </ul>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRm52iU1Uu6XY6x0UOWiSk884ndvLSBqsUtsQ&s"
+                alt="Mechanical Engineering Department">
+        </div>
+
+        <div id="eee-department" class="department-section">
+            <h2>Electrical and Electronics Engineering (EEE)</h2>
+            <p>EEE covers power systems, control systems, and electronics, with a focus on both electrical and
+                electronic applications.</p>
+            <h3>Placements:</h3>
+            <p><strong>Placement Rate:</strong> 75%-80% (for M.Tech)</p>
+            <p><strong>Top Recruiters:</strong> ABB, Siemens, NTPC, TCS</p>
+            <h3>Technologies Used:</h3>
+            <ul>
+                <li><strong>Power Systems:</strong> SCADA systems, Power grid analysis software</li>
+                <li><strong>Control Systems:</strong> PLC, PID controllers</li>
+                <li><strong>Electronics:</strong> Circuit design tools (e.g., PSPICE)</li>
+                <li><strong>Renewable Energy:</strong> Solar and wind power technologies</li>
+            </ul>
+            <img src="data:image/jpeg;base64,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"
+                alt="Electrical and Electronics Engineering Department">
+        </div>
+
+        <div id="civil-department" class="department-section">
+            <h2>Civil Engineering</h2>
+            <p>The Civil department focuses on the design, construction, and maintenance of the built environment,
+                including bridges, roads, and buildings.</p>
+            <h3>Placements:</h3>
+            <p><strong>Placement Percentage (2023-24):</strong> Approximately 26.24%</p>
+            <p><strong>Top Recruiters:</strong> L&T, Tata Projects, GMR Infra</p>
+            <h3>Technologies Used:</h3>
+            <ul>
+                <li><strong>Design Software:</strong> AutoCAD, Revit, STAAD.Pro</li>
+                <li><strong>GIS:</strong> Geographic Information System mapping</li>
+                <li><strong>Construction Management:</strong> BIM (Building Information Modeling)</li>
+                <li><strong>Surveying:</strong> Total Station, GPS technology</li>
+            </ul>
+            <img src="https://d13loartjoc1yn.cloudfront.net/upload/institute/images/large/120725093250_170a.webp"
+                alt="Civil Engineering Department">
+        </div>
+        <div id="DataScience-department" class="department-section">
+            <h2>Data Science</h2>
+            <p>The Data Science department focuses on extracting insights from complex data sets using various
+                techniques, including machine learning, statistical analysis, and data visualization.</p>
+            <h3>Placements:</h3>
+            <p><strong>Placement Percentage (2023-24):</strong> Approximately 68.24%</p>
+            <p><strong>Top Recruiters:</strong> IBM, Accenture, TCS, Wipro, Infosys, TechMahendra</p>
+            <h3>Technologies Used:</h3>
+            <ul>
+                <li><strong>Programming:</strong> Python, R, SQL</li>
+                <li><strong>Data Analysis:</strong> Pandas, NumPy, Excel</li>
+                <li><strong>Data Visualization:</strong> Matplotlib, Seaborn, Power BI, Tableau</li>
+                <li><strong>Machine Learning:</strong> Scikit-learn, TensorFlow, Keras</li>
+                <li><strong>Big Data Tools:</strong> Hadoop, Spark</li>
+                <li><strong>Cloud Platforms:</strong> AWS, Google Cloud, Azure</li>
+                <li><strong>Database Management:</strong> MySQL, MongoDB</li>
+                <li><strong>Version Control:</strong> Git, GitHub</li>
+
+            </ul>
+            <img src="https://d13loartjoc1yn.cloudfront.net/upload/institute/images/large/120725093250_170a.webp"
+                alt="Data Science Department">
+        </div>
+
+    </div>
+
+    <br />
+    <div class="myclass1">
+        <div style="background-color:blueviolet">
+            <h1>Computer Science</h1>
+            <p>Computer science is the study of computers and how they are used, including the theory and practice of
+                computing. It's a broad field that uses engineering, logic, and mathematics to solve problems</p>
+        </div>
+        <div style="background-color:rgb(90, 70, 133)">
+            <h1>Electronic Communication</h1>
+            <p>Electronic communication is the transmission of information using electronic devices and technologies. It
+                can be done via email, video calling, fax, and more. Electronic communication is a quick.</p>
+        </div>
+        <div style="background-color:rgb(105, 155, 125)">
+            <h1>Information Technology</h1>
+            <p>Information technology (IT) is the use of computers, software, networks, and other devices to store,
+                retrieve, and share information. It's a broad field that includes many subfields and specializations.
+            </p>
+        </div>
+    </div>
+    <br />
+    <div class="myclass2">
+        <div style="background-color:blueviolet">
+            <h1>Civil Engineering</h1>
+            <p>Civil engineering is a broad discipline focused on designing, constructing, and maintaining
+                the physical and naturally built environment,works like roads, bridges, buildings, and infrastructure.
+            </p>
+        </div>
+        <div style="background-color:rgb(90, 70, 133)">
+            <h1>Mechanical Engineering</h1>
+            <p>Mechanical engineering is a broad engineering discipline focused on designing, analyzing, manufacturing,
+                and maintaining mechanical systems, encompassing the study of physical machines.</p>
+        </div>
+        <div style="background-color:rgb(105, 155, 125)">
+            <h1>Elctrical Electronics</h1>
+            <p>Electrical and Electronics Engineering (EEE) is a broad field that focuses on the study and application
+                of electricity,electronics, and electromagnetism, encompassing areas like power systems.
+            </p>
+        </div>
+    </div>
+    <div class="loginform">
+        <br />
+        <form action="/login" method="POST" id="registrationForm">
+            <h1 class="login" style="color:rgb(62, 18, 163)">Student login</h1>
+            <div id="initialLoginFields">
+                <label for="username">Registration no:</label><br />
+                <input id="username" name="username" placeholder="Enter registration number" required=""
+                    style="border-radius:5px; width: calc(100% - 10px); padding: 5px; box-sizing: border-box;"
+                    type="text" /><br />
+                <label for="password">Password:</label><br />
+                <input id="password" name="password" placeholder="Enter password" required=""
+                    style="border-radius:5px; width: calc(100% - 10px); padding: 5px; box-sizing: border-box;"
+                    type="password" /><br />
+            </div>
+
+            <div class="button-container">
+                <button type="submit" id="loginButton"
+                    style="padding: 8px 15px; border-radius: 5px; background-color: rgb(85, 180, 155); color: white; border: none; cursor: pointer;">Login</button>
+                <button type="button" id="registerButton"
+                    style="padding: 8px 15px; border-radius: 5px; background-color: rgb(62, 18, 163); color: white; border: none; cursor: pointer;">Register</button>
+            </div>
+
+            <div id="otpRegistrationSection" style="display: none; text-align: center; margin-top: 15px;">
+                <label for="emailInput" style="color: white; display: block; margin-bottom: 5px;">Email:</label>
+                <input type="email" id="emailInput" name="email" placeholder="Enter your email"
+                    style="border-radius:5px; width: calc(100% - 20px); padding: 8px; box-sizing: border-box;" /><br />
+                <button type="button" id="sendOtpButton"
+                    style="margin-top: 15px; padding: 8px 15px; border-radius: 5px; background-color: rgb(85, 180, 155); color: white; border: none; cursor: pointer;">Send
+                    OTP</button>
+                <p id="otpMessage" style="color: yellow; margin-top: 10px; font-size: 0.9em;"></p>
+
+                <div id="otpVerificationFields" style="display: none; margin-top: 15px;">
+                    <label for="otpInput" style="color: white;">Enter OTP:</label><br />
+                    <input type="text" id="otpInput" name="otpInput" placeholder="Enter OTP"
+                        style="border-radius:5px; width: calc(100% - 20px); padding: 8px; box-sizing: border-box;" /><br />
+                    <button type="button" id="verifyOtpButton"
+                        style="margin-top: 10px; padding: 8px 15px; border-radius: 5px; background-color: orange; color: white; border: none; cursor: pointer;">Verify
+                        OTP</button>
+                </div>
+                <div id="finalRegistrationFields" style="display: none; margin-top: 15px;">
+                    <label for="regUsername" style="color: white;">Registration Number:</label><br />
+                    <input type="text" id="regUsername" name="regUsername" placeholder="Enter registration number"
+                        style="border-radius:5px; width: calc(100% - 20px); padding: 8px; box-sizing: border-box;" /><br />
+                    <label for="regPassword" style="color: white; margin-top: 10px;">Password:</label><br />
+                    <input type="password" id="regPassword" name="regPassword" placeholder="Create a password"
+                        style="border-radius:5px; width: calc(100% - 20px); padding: 8px; box-sizing: border-box;" /><br />
+                    <button type="button" id="finalRegisterButton"
+                        style="margin-top: 15px; padding: 8px 15px; border-radius: 5px; background-color: green; color: white; border: none; cursor: pointer;">Finish
+                        Registration</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <br />
+    <br />
+    <br />
+    <hr style="margin-top:300px" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const initialLoginFields = document.getElementById('initialLoginFields');
+            const loginButton = document.getElementById('loginButton');
+            const registerButton = document.getElementById('registerButton');
+            const otpRegistrationSection = document.getElementById('otpRegistrationSection');
+            const emailInput = document.getElementById('emailInput');
+            const sendOtpButton = document.getElementById('sendOtpButton');
+            const otpMessage = document.getElementById('otpMessage');
+            const otpVerificationFields = document.getElementById('otpVerificationFields');
+            const otpInput = document.getElementById('otpInput');
+            const verifyOtpButton = document.getElementById('verifyOtpButton');
+            const loginFormTitle = document.querySelector('.loginform .login');
+            const registrationForm = document.getElementById('registrationForm');
+
+            const aboutLink = document.getElementById('about-link');
+            const aboutModal = document.getElementById('about-modal');
+            const closeBtn = document.querySelector('.close-btn');
+            const detailsLink = document.getElementById('details-link');
+            const departmentDetailsContainer = document.getElementById('department-details-container');
+
+            function resetFormToInitialState() {
+                initialLoginFields.style.display = 'block';
+                loginButton.style.display = 'inline-block';
+                registerButton.style.display = 'inline-block';
+                otpRegistrationSection.style.display = 'none';
+                otpVerificationFields.style.display = 'none';
+                otpMessage.textContent = '';
+                emailInput.value = '';
+                otpInput.value = '';
+                sendOtpButton.disabled = false;
+                loginFormTitle.textContent = 'Student login';
+                registrationForm.action = '/login';
+            }
+
+            registerButton.onclick = function () {
+                initialLoginFields.style.display = 'none';
+                loginButton.style.display = 'none';
+                registerButton.style.display = 'none';
+                otpRegistrationSection.style.display = 'block';
+                otpMessage.textContent = '';
+                emailInput.value = '';
+                otpInput.value = '';
+                otpVerificationFields.style.display = 'none';
+                loginFormTitle.textContent = 'Register';
+            };
+
+            sendOtpButton.onclick = async function () {
+                const email = emailInput.value;
+
+                if (!email || !email.includes('@') || !email.includes('.')) {
+                    otpMessage.textContent = 'Please enter a valid email address.';
+                    otpMessage.style.color = 'red';
+                    return;
+                }
+
+                otpMessage.textContent = 'Sending OTP to ' + email + '...';
+                otpMessage.style.color = 'yellow';
+                sendOtpButton.disabled = true;
+
+                try {
+                    const response = await fetch('/send-otp', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email: email }),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        otpMessage.textContent = 'OTP sent! Please check your email.';
+                        otpMessage.style.color = 'lightgreen';
+                        otpVerificationFields.style.display = 'block';
+                        sendOtpButton.style.display = 'none';
+                    } else {
+                        otpMessage.textContent = 'Failed to send OTP: ' + (data.error || 'Unknown error');
+                        otpMessage.style.color = 'red';
+                        sendOtpButton.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Error sending OTP:', error);
+                    otpMessage.textContent = 'Network error. Please try again.';
+                    otpMessage.style.color = 'red';
+                    sendOtpButton.disabled = false;
+                }
+            };
+
+            verifyOtpButton.onclick = async function () {
+                const email = emailInput.value;
+                const enteredOtp = otpInput.value;
+
+                if (!enteredOtp) {
+                    otpMessage.textContent = 'Please enter the OTP.';
+                    otpMessage.style.color = 'red';
+                    return;
+                }
+
+                otpMessage.textContent = 'Verifying OTP...';
+                otpMessage.style.color = 'yellow';
+                verifyOtpButton.disabled = true;
+
+                try {
+                    const response = await fetch('/verify-otp', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email: email, otp: enteredOtp }),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        otpMessage.textContent = 'OTP verified! Now complete registration.';
+                        otpMessage.style.color = 'lightgreen';
+                        otpVerificationFields.style.display = 'none';
+                        document.getElementById('finalRegistrationFields').style.display = 'block';
+                    } else {
+                        otpMessage.textContent = 'Invalid OTP. Please try again.';
+                        otpMessage.style.color = 'red';
+                        otpInput.value = '';
+                        verifyOtpButton.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Error verifying OTP:', error);
+                    otpMessage.textContent = 'Network error during OTP verification. Please try again.';
+                    otpMessage.style.color = 'red';
+                    verifyOtpButton.disabled = false;
+                }
+            };
+
+            loginButton.onclick = function () {
+                registrationForm.submit();
+            };
+
+            aboutLink.addEventListener('click', function (event) {
+                event.preventDefault();
+                aboutModal.style.display = "flex";
+            });
+
+            closeBtn.addEventListener('click', function () {
+                aboutModal.style.display = "none";
+            });
+
+            window.addEventListener('click', function (event) {
+                if (event.target == aboutModal) {
+                    aboutModal.style.display = "none";
+                }
+            });
+
+            detailsLink.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                if (departmentDetailsContainer.style.display === 'none' || departmentDetailsContainer.style.display === '') {
+                    departmentDetailsContainer.style.display = 'block';
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                } else {
+                    departmentDetailsContainer.style.display = 'none';
+                }
+            });
+        });
+
+        document.getElementById('finalRegisterButton').onclick = async function () {
+            const email = document.getElementById('emailInput').value;
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+
+            if (!username || !password) {
+                alert("Please fill in registration number and password.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password, email }),
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message || "Registration complete! Please login.");
+                    location.reload();
+                } else {
+                    alert(data.error || "Registration failed.");
+                }
+            } catch (err) {
+                alert("Server error during registration.");
+            }
+        };
+    </script>
+    <footer>
+        <div class="describe">
+            <h1 style="color:rgb(85, 180, 155)">Bapatla Engineering Collage(Autonomous)</h1>
+            <h3><a alt="cannot open" href="www.becbapatla.ac.in">www.becbapatla.ac.in</a></h3>
+            <h4 style="color:rgb(110, 100, 67)">Developed by Avinash Reddy </h4>
+            <h5>Department Data Science</h5>
+        </div>
+    </footer>
+</body>
+
+</html>

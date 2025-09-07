@@ -5,11 +5,12 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 
+require('dotenv').config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-require('dotenv').config();
-// MongoDB connection using environment variable and direct connection string
+// MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
     serverSelectionTimeoutMS: 5000
 })
@@ -29,54 +30,53 @@ const Student = mongoose.model('Student', studentSchema);
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
-// Serve static files from the public directory (where collage.html and dashboard.html are)
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve dashboard.html only via /dashboard route
-app.get('/dashboard', (req, res) => {
-    console.log("Serving dashboard.html");
-    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+// Serve static files from the public folder
+const publicPath = path.join(__dirname, 'public');
+app.use(express.static(publicPath));
+
+// Root route: serve collage.html
+app.get('/', (req, res) => {
+    const filePath = path.join(publicPath, 'collage.html');
+    console.log(`Serving: ${filePath}`);
+    res.sendFile(filePath, (err) => {
+        if (err) console.error('Error sending collage.html:', err);
+    });
 });
 
-// Login route: always redirect to /dashboard
+// Dashboard route
+app.get('/dashboard', (req, res) => {
+    const filePath = path.join(publicPath, 'dashboard.html');
+    console.log(`Serving: ${filePath}`);
+    res.sendFile(filePath, (err) => {
+        if (err) console.error('Error sending dashboard.html:', err);
+    });
+});
+
+// Login route
 app.post('/login', async (req, res) => {
-    console.log("Received login request.");
     const { username, password } = req.body;
-    if (!username || !password) {
-        console.log("Login failed: Username or password missing.");
-        return res.status(400).send("Username and password are required");
-    }
+    if (!username || !password) return res.status(400).send("Username and password required");
     try {
         const student = await Student.findOne({ username });
-        if (!student) {
-            console.log(`Login failed: User '${username}' not found.`);
-            return res.status(401).send("Invalid username or password");
-        }
+        if (!student) return res.status(401).send("Invalid username or password");
+
         const isMatch = await bcrypt.compare(password, student.password);
-        if (!isMatch) {
-            console.log("Login failed: Incorrect password.");
-            return res.status(401).send("Invalid username or password");
-        }
+        if (!isMatch) return res.status(401).send("Invalid username or password");
+
         console.log(`User '${username}' logged in successfully.`);
-        // Always redirect to dashboard
         res.redirect('/dashboard');
     } catch (error) {
-        console.error("Login Error:", error);
-        res.status(500).send("Login Failed due to server error.");
+        console.error("Login error:", error);
+        res.status(500).send("Server error");
     }
 });
 
-// Serve the collage.html at the root URL when the user accesses '/'
-app.get('/', (req, res) => {
-    console.log("Serving collage.html");
-    res.sendFile(path.join(__dirname, 'public', 'collage.html'));
-});
-
-// In-memory store for OTPs (for demo; use DB for production)
+// In-memory OTP store (for demo)
 const otpStore = {};
 
-// Nodemailer transporter setup using environment variables
+// Nodemailer setup
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -84,22 +84,25 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS
     }
 });
-// Send OTP route (this must be inside your server.js, not at the top level)
+
+// Send OTP route
 app.post('/send-otp', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
+
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     otpStore[email] = otp;
+
     try {
         await transporter.sendMail({
-            from: process.env.EMAIL_USER, // <-- FIXED
+            from: process.env.EMAIL_USER,
             to: email,
             subject: 'Your OTP Code',
             text: `Your OTP is: ${otp}`
         });
         res.json({ message: 'OTP sent!' });
     } catch (error) {
-        console.error('Error sending OTP email:', error);
+        console.error('Error sending OTP:', error);
         res.status(500).json({ error: 'Failed to send OTP' });
     }
 });
@@ -114,31 +117,26 @@ app.post('/verify-otp', (req, res) => {
     res.status(400).json({ success: false, message: 'Invalid OTP' });
 });
 
-// Register route (call this after OTP is verified)
+// Register route
 app.post('/register', async (req, res) => {
     const { username, password, email } = req.body;
-    if (!username || !password || !email) {
-        return res.status(400).json({ error: 'Username, password, and email are required' });
-    }
+    if (!username || !password || !email) return res.status(400).json({ error: 'All fields required' });
+
     try {
-        // Check if user already exists
         const existingUser = await Student.findOne({ username });
-        if (existingUser) {
-            return res.status(409).json({ error: 'Username already exists' });
-        }
-        // Hash the password
+        if (existingUser) return res.status(409).json({ error: 'Username already exists' });
+
         const hashedPassword = await bcrypt.hash(password, 10);
-        // Save new user (FIX: include email)
         const newUser = new Student({ username, password: hashedPassword, email });
         await newUser.save();
-        res.json({ message: 'Registration successful! You can now log in.' });
+        res.json({ message: 'Registration successful!' });
     } catch (error) {
         console.error('Registration error:', error);
-        res.status(500).json({ error: 'Registration failed due to server error.' });
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
-// Start server and listen on the specified PORT
+// Start server
 app.listen(PORT, () => {
-    console.log(`Server running on http://127.0.0.1:${PORT}`);
+    console.log(`Server running on port http://127.0.0.1:${PORT}`);
 });
